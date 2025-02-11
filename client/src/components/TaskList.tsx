@@ -116,7 +116,7 @@ export function TaskList({ tasks }: TaskListProps) {
                   </div>
 
                   <p className="text-sm text-gray-500">
-                    Due: {format(new Date(task.dueDate), 'PPP')} at {task.dueTime}
+                    Due: {format(new Date(task.dueDate), 'PPP', { timeZone: 'Asia/Kolkata' })} at {format(new Date(task.dueTime), 'p', { timeZone: 'Asia/Kolkata' })}
                   </p>
                 </div>
 

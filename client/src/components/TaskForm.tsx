@@ -110,12 +110,12 @@ export function TaskForm() {
             name="dueTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-gray-700 font-medium">Due Time</FormLabel>
+                <FormLabel className="text-gray-700 font-medium">Due Time (IST)</FormLabel>
                 <FormControl>
                   <Input 
                     type="time" 
-                    className="h-12 bg-white/90 border-indigo-100/30 focus:border-indigo-500 focus:ring-indigo-500/20" 
-                    {...field} 
+                    className="h-12 bg-white/90 border-indigo-100/30 focus:border-indigo-500 focus:ring-indigo-500/20"
+                    {...field}
                   />
                 </FormControl>
               </FormItem>
