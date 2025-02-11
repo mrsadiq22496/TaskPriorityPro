@@ -8,6 +8,13 @@ import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TaskListProps {
   tasks: Task[];
@@ -24,6 +31,20 @@ export function TaskList({ tasks }: TaskListProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+    }
+  });
+
+  const priorityMutation = useMutation({
+    mutationFn: async ({ id, priority }: { id: number; priority: number }) => {
+      const res = await apiRequest("PATCH", `/api/tasks/${id}`, { priority });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({
+        title: "Priority Updated",
+        description: `Task priority changed to ${priorityLabels[data.priority as keyof typeof priorityLabels]}`,
+      });
     }
   });
 
@@ -67,12 +88,31 @@ export function TaskList({ tasks }: TaskListProps) {
                     <h3 className={`font-medium text-gray-900 truncate ${task.completed ? 'line-through text-gray-500' : ''}`}>
                       {task.title}
                     </h3>
-                    <Badge 
-                      style={{ backgroundColor: priorityColors[task.priority as keyof typeof priorityColors] }}
-                      className="text-white text-xs px-2.5 py-0.5 rounded-full transition-transform group-hover:scale-105"
+                    <Select
+                      defaultValue={String(task.priority)}
+                      onValueChange={(value) => {
+                        priorityMutation.mutate({
+                          id: task.id,
+                          priority: parseInt(value)
+                        });
+                      }}
                     >
-                      {priorityLabels[task.priority as keyof typeof priorityLabels]}
-                    </Badge>
+                      <SelectTrigger className="w-[110px] h-7">
+                        <SelectValue>
+                          <Badge 
+                            style={{ backgroundColor: priorityColors[task.priority as keyof typeof priorityColors] }}
+                            className="text-white text-xs px-2.5 py-0.5 rounded-full transition-transform group-hover:scale-105"
+                          >
+                            {priorityLabels[task.priority as keyof typeof priorityLabels]}
+                          </Badge>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Low Priority</SelectItem>
+                        <SelectItem value="2">Medium Priority</SelectItem>
+                        <SelectItem value="3">High Priority</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <p className="text-sm text-gray-500">
