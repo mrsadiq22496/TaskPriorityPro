@@ -6,9 +6,11 @@ import {
 } from "@/components/ui/popover";
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
-import { isAfter, isBefore, addHours, parse, format } from "date-fns";
+import { isAfter, isBefore, addHours, format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface NotificationBellProps {
   tasks: Task[];
@@ -16,18 +18,30 @@ interface NotificationBellProps {
 
 export function NotificationBell({ tasks }: NotificationBellProps) {
   const { toast } = useToast();
-  const [lastNotifiedIds, setLastNotifiedIds] = useState<Set<number>>(new Set());
+  const queryClient = useQueryClient();
+  const [notifiedIds, setNotifiedIds] = useState<number[]>([]);
+
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ id }: { id: number }) => {
+      const res = await apiRequest("PATCH", `/api/tasks/${id}`, { notified: true });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+    }
+  });
 
   const upcomingTasks = tasks.filter(task => {
-    if (task.completed || task.priority !== 3) return false;
+    if (task.completed || task.priority !== 3 || task.notified || notifiedIds.includes(task.id)) {
+      return false;
+    }
 
     const dueDateTime = new Date(task.dueDate);
     const [hours, minutes] = task.dueTime.split(':');
     dueDateTime.setHours(parseInt(hours), parseInt(minutes));
 
     const now = new Date();
-    const isUpcoming = !task.notified && 
-                      isAfter(dueDateTime, now) &&
+    const isUpcoming = isAfter(dueDateTime, now) && 
                       isBefore(dueDateTime, addHours(now, 24));
 
     return isUpcoming;
@@ -37,22 +51,27 @@ export function NotificationBell({ tasks }: NotificationBellProps) {
   useEffect(() => {
     const checkNotifications = () => {
       upcomingTasks.forEach(task => {
-        if (!lastNotifiedIds.has(task.id)) {
+        if (!notifiedIds.includes(task.id)) {
           toast({
             title: "Upcoming High Priority Task",
             description: `"${task.title}" is due at ${task.dueTime}`,
             duration: 5000,
           });
-          setLastNotifiedIds(prev => new Set([...prev, task.id]));
+
+          // Update both local state and server state
+          setNotifiedIds(prev => [...prev, task.id]);
+          updateTaskMutation.mutate({ id: task.id });
         }
       });
     };
 
-    checkNotifications(); // Check immediately
-    const interval = setInterval(checkNotifications, 60000); // Check every minute
+    // Initial check
+    checkNotifications();
 
+    // Set up interval for periodic checks
+    const interval = setInterval(checkNotifications, 30000); // Check every 30 seconds for demo purposes
     return () => clearInterval(interval);
-  }, [tasks, toast]);
+  }, [tasks, notifiedIds, toast, updateTaskMutation]);
 
   const count = upcomingTasks.length;
 
