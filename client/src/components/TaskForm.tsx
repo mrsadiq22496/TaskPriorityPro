@@ -12,13 +12,14 @@ import { useToast } from "@/hooks/use-toast";
 export function TaskForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const form = useForm<InsertTask>({
     resolver: zodResolver(insertTaskSchema),
     defaultValues: {
       title: "",
       priority: 2,
-      dueDate: new Date().toISOString().split('T')[0]
+      dueDate: new Date().toISOString().split('T')[0],
+      dueTime: new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
     }
   });
 
@@ -53,7 +54,7 @@ export function TaskForm() {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="priority"
@@ -87,6 +88,19 @@ export function TaskForm() {
                 <FormLabel>Due Date</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="dueTime"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Due Time</FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
                 </FormControl>
               </FormItem>
             )}

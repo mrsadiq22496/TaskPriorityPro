@@ -3,6 +3,7 @@ import { Task, priorityColors, priorityLabels } from "@shared/schema";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -50,7 +51,7 @@ export function TaskList({ tasks }: TaskListProps) {
                   toggleMutation.mutate({ id: task.id, completed: checked as boolean });
                 }}
               />
-              
+
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className={`font-medium ${task.completed ? 'line-through text-gray-500' : ''}`}>
@@ -63,9 +64,9 @@ export function TaskList({ tasks }: TaskListProps) {
                     {priorityLabels[task.priority as keyof typeof priorityLabels]}
                   </Badge>
                 </div>
-                
+
                 <p className="text-sm text-gray-500">
-                  Due: {format(new Date(task.dueDate), 'PPP')}
+                  Due: {format(new Date(task.dueDate), 'PPP')} at {task.dueTime}
                 </p>
               </div>
 

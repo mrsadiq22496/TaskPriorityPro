@@ -7,6 +7,7 @@ export const tasks = pgTable("tasks", {
   title: text("title").notNull(),
   priority: integer("priority").notNull(), // 1: Low, 2: Medium, 3: High
   dueDate: timestamp("due_date").notNull(),
+  dueTime: text("due_time").notNull(), // Store time as HH:mm format
   completed: boolean("completed").notNull().default(false),
   notified: boolean("notified").notNull().default(false)
 });
@@ -16,7 +17,8 @@ export const insertTaskSchema = createInsertSchema(tasks)
   .extend({
     title: z.string().min(1, "Title is required").max(100),
     priority: z.number().min(1).max(3),
-    dueDate: z.string().transform((str) => new Date(str))
+    dueDate: z.string().transform((str) => new Date(str)),
+    dueTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format")
   });
 
 export type Task = typeof tasks.$inferSelect;

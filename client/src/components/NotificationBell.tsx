@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
-import { isAfter, isBefore, addHours } from "date-fns";
+import { isAfter, isBefore, addHours, parse, format } from "date-fns";
 
 interface NotificationBellProps {
   tasks: Task[];
@@ -14,13 +14,16 @@ interface NotificationBellProps {
 
 export function NotificationBell({ tasks }: NotificationBellProps) {
   const upcomingTasks = tasks.filter(task => {
-    const dueDate = new Date(task.dueDate);
+    const dueDateTime = new Date(task.dueDate);
+    const [hours, minutes] = task.dueTime.split(':');
+    dueDateTime.setHours(parseInt(hours), parseInt(minutes));
+
     const now = new Date();
     return (
       !task.completed &&
       task.priority === 3 && // High priority only
-      isAfter(dueDate, now) &&
-      isBefore(dueDate, addHours(now, 24))
+      isAfter(dueDateTime, now) &&
+      isBefore(dueDateTime, addHours(now, 24))
     );
   });
 
@@ -47,7 +50,10 @@ export function NotificationBell({ tasks }: NotificationBellProps) {
             <div className="space-y-2">
               {upcomingTasks.map(task => (
                 <div key={task.id} className="text-sm p-2 bg-gray-50 rounded">
-                  {task.title}
+                  <div className="font-medium">{task.title}</div>
+                  <div className="text-gray-500">
+                    Due: {format(new Date(task.dueDate), 'PPP')} at {task.dueTime}
+                  </div>
                 </div>
               ))}
             </div>
