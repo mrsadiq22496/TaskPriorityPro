@@ -1,13 +1,19 @@
-import { TaskForm } from "@/components/TaskForm";
 import { TaskList } from "@/components/TaskList";
 import { NotificationBell } from "@/components/NotificationBell";
 import { useQuery } from "@tanstack/react-query";
 import type { Task } from "@shared/schema";
+import { Navigation } from "@/components/Navigation";
+import { useRoute } from "wouter";
 
 export default function Home() {
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
   });
+  const [, params] = useRoute("/priority/:priority");
+
+  const filteredTasks = params?.priority
+    ? tasks.filter((task) => task.priority === parseInt(params.priority))
+    : tasks;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -22,10 +28,8 @@ export default function Home() {
           <NotificationBell tasks={tasks} />
         </header>
 
-        <div className="space-y-8">
-          <TaskForm />
-          <TaskList tasks={tasks} />
-        </div>
+        <Navigation />
+        <TaskList tasks={filteredTasks} />
       </div>
     </div>
   );
