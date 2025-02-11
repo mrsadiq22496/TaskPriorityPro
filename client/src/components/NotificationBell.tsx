@@ -7,25 +7,52 @@ import {
 import { Task } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { isAfter, isBefore, addHours, parse, format } from "date-fns";
+import { useEffect, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface NotificationBellProps {
   tasks: Task[];
 }
 
 export function NotificationBell({ tasks }: NotificationBellProps) {
+  const { toast } = useToast();
+  const [lastNotifiedIds, setLastNotifiedIds] = useState<Set<number>>(new Set());
+
   const upcomingTasks = tasks.filter(task => {
+    if (task.completed || task.priority !== 3) return false;
+
     const dueDateTime = new Date(task.dueDate);
     const [hours, minutes] = task.dueTime.split(':');
     dueDateTime.setHours(parseInt(hours), parseInt(minutes));
 
     const now = new Date();
-    return (
-      !task.completed &&
-      task.priority === 3 && // High priority only
-      isAfter(dueDateTime, now) &&
-      isBefore(dueDateTime, addHours(now, 24))
-    );
+    const isUpcoming = !task.notified && 
+                      isAfter(dueDateTime, now) &&
+                      isBefore(dueDateTime, addHours(now, 24));
+
+    return isUpcoming;
   });
+
+  // Check for new notifications every minute
+  useEffect(() => {
+    const checkNotifications = () => {
+      upcomingTasks.forEach(task => {
+        if (!lastNotifiedIds.has(task.id)) {
+          toast({
+            title: "Upcoming High Priority Task",
+            description: `"${task.title}" is due at ${task.dueTime}`,
+            duration: 5000,
+          });
+          setLastNotifiedIds(prev => new Set([...prev, task.id]));
+        }
+      });
+    };
+
+    checkNotifications(); // Check immediately
+    const interval = setInterval(checkNotifications, 60000); // Check every minute
+
+    return () => clearInterval(interval);
+  }, [tasks, toast]);
 
   const count = upcomingTasks.length;
 
