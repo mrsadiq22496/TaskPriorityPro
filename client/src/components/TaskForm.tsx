@@ -40,33 +40,41 @@ export function TaskForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4 bg-white p-6 rounded-lg shadow-sm">
+      <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} 
+            className="space-y-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100 transition-all hover:shadow-md">
+        <div className="border-b pb-4">
+          <h2 className="text-lg font-semibold text-gray-900">Add New Task</h2>
+          <p className="text-sm text-gray-500">Create a new task with priority and due date</p>
+        </div>
+
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Task Title</FormLabel>
+              <FormLabel className="text-gray-700">Task Title</FormLabel>
               <FormControl>
-                <Input placeholder="Enter task title..." {...field} />
+                <Input placeholder="Enter task title..." 
+                       className="h-11 px-4"
+                       {...field} />
               </FormControl>
             </FormItem>
           )}
         />
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-6">
           <FormField
             control={form.control}
             name="priority"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Priority</FormLabel>
+                <FormLabel className="text-gray-700">Priority</FormLabel>
                 <Select 
                   onValueChange={(value) => field.onChange(parseInt(value))}
                   value={field.value.toString()}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-11">
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
@@ -85,9 +93,9 @@ export function TaskForm() {
             name="dueDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Due Date</FormLabel>
+                <FormLabel className="text-gray-700">Due Date</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <Input type="date" className="h-11" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -98,9 +106,9 @@ export function TaskForm() {
             name="dueTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Due Time</FormLabel>
+                <FormLabel className="text-gray-700">Due Time</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" className="h-11" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -109,7 +117,7 @@ export function TaskForm() {
 
         <Button 
           type="submit" 
-          className="w-full"
+          className="w-full h-11 text-base font-medium transition-transform hover:scale-[1.02]"
           disabled={mutation.isPending}
         >
           {mutation.isPending ? "Adding..." : "Add Task"}
