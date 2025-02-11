@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Trash2 } from "lucide-react";
 
 interface TaskListProps {
   tasks: Task[];
@@ -42,13 +43,15 @@ export function TaskList({ tasks }: TaskListProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Your Tasks</h2>
-        <p className="text-sm text-gray-500">{tasks.length} tasks total</p>
+        <h2 className="text-xl font-semibold text-gray-900">Your Tasks</h2>
+        <p className="text-sm text-gray-500 bg-white/80 px-3 py-1 rounded-full">
+          {tasks.length} tasks total
+        </p>
       </div>
 
       <div className="space-y-3">
         {tasks.map((task) => (
-          <Card key={task.id} className="transition-all hover:shadow-md border border-gray-100">
+          <Card key={task.id} className="group transition-all duration-300 hover:shadow-lg hover:shadow-indigo-100/20 bg-white/80 backdrop-blur-sm border-indigo-100/20">
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
                 <Checkbox 
@@ -56,7 +59,7 @@ export function TaskList({ tasks }: TaskListProps) {
                   onCheckedChange={(checked) => {
                     toggleMutation.mutate({ id: task.id, completed: checked as boolean });
                   }}
-                  className="mt-1"
+                  className="mt-1.5 h-5 w-5 rounded-full border-2 border-indigo-200 data-[state=checked]:border-indigo-500 data-[state=checked]:bg-indigo-500"
                 />
 
                 <div className="flex-1 min-w-0">
@@ -66,7 +69,7 @@ export function TaskList({ tasks }: TaskListProps) {
                     </h3>
                     <Badge 
                       style={{ backgroundColor: priorityColors[task.priority as keyof typeof priorityColors] }}
-                      className="text-white text-xs px-2 py-0.5"
+                      className="text-white text-xs px-2.5 py-0.5 rounded-full transition-transform group-hover:scale-105"
                     >
                       {priorityLabels[task.priority as keyof typeof priorityLabels]}
                     </Badge>
@@ -81,9 +84,9 @@ export function TaskList({ tasks }: TaskListProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => deleteMutation.mutate(task.id)}
-                  className="text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"
+                  className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
                 >
-                  Delete
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -91,7 +94,7 @@ export function TaskList({ tasks }: TaskListProps) {
         ))}
 
         {tasks.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-200">
+          <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl border border-dashed border-indigo-200">
             <p className="text-gray-500">No tasks yet. Add one above!</p>
           </div>
         )}

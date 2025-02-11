@@ -32,8 +32,8 @@ export function NotificationBell({ tasks }: NotificationBellProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="relative p-2.5 rounded-full hover:bg-gray-100 transition-colors">
-          <Bell className="h-6 w-6 text-gray-600" />
+        <button className="relative p-2.5 rounded-full hover:bg-indigo-100/50 transition-all duration-300">
+          <Bell className="h-6 w-6 text-indigo-600" />
           {count > 0 && (
             <Badge 
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-red-500 animate-pulse"
@@ -43,7 +43,7 @@ export function NotificationBell({ tasks }: NotificationBellProps) {
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-4">
+      <PopoverContent className="w-80 p-4 bg-white/95 backdrop-blur-sm border-indigo-100/20 shadow-xl shadow-indigo-100/20">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-red-500" />
@@ -52,7 +52,7 @@ export function NotificationBell({ tasks }: NotificationBellProps) {
           {upcomingTasks.length > 0 ? (
             <div className="space-y-2">
               {upcomingTasks.map(task => (
-                <div key={task.id} className="text-sm p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                <div key={task.id} className="text-sm p-3 bg-red-50/50 rounded-xl hover:bg-red-50 transition-all duration-300">
                   <div className="font-medium text-gray-900">{task.title}</div>
                   <div className="text-gray-500 text-xs mt-1">
                     Due: {format(new Date(task.dueDate), 'PPP')} at {task.dueTime}
