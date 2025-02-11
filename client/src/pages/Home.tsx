@@ -9,11 +9,17 @@ export default function Home() {
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["/api/tasks"],
   });
-  const [, params] = useRoute("/priority/:priority");
+  const [matchPriority, priorityParams] = useRoute("/priority/:priority");
+  const [matchCompleted] = useRoute("/completed");
 
-  const filteredTasks = params?.priority
-    ? tasks.filter((task) => task.priority === parseInt(params.priority))
-    : tasks;
+  const filteredTasks = matchCompleted
+    ? tasks.filter((task) => task.completed)
+    : matchPriority
+    ? tasks.filter(
+        (task) =>
+          task.priority === parseInt(priorityParams!.priority) && !task.completed
+      )
+    : tasks.filter((task) => !task.completed);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">

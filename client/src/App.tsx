@@ -10,6 +10,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/priority/:priority" component={Home} />
+      <Route path="/completed" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
